@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+    <script src="../dist/umd/CanvasVerificationCode.umd.cjs"></script>
+  </head>
+  <body>
+    <button id="btn">点击</button>
+    <div id="code_container"></div>
+    <script>
+      function initCanvasVerificationCode() {
+        new CanvasVerificationCode({
+          el: document.getElementById('code_container'),
+          imgArr: [
+            `https://filedown.bld365.com/tuike/upload/file/doctor-user-mp/20231225/F202312256f9ad600011.png`,
+            `https://filedown.bld365.com/tuike/upload/file/doctor-user-mp/20231225/F2023122573424000012.png`,
+          ],
+        })
+      }
+
+      console.log('🚀 ~ window', window)
+
+      window.onload = function () {
+        document.getElementById('btn').addEventListener('click', () => {
+          initCanvasVerificationCode()
+        })
+      }
+    </script>
+  </body>
+</html>
