@@ -1,0 +1,102 @@
+.verification_code_container {
+  position: relative;
+  font-size: 0;
+
+  .verification_code_canvas {
+  }
+
+  .verification_code_block {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .verification_code_sliderContainer {
+    height: 40px;
+    position: relative;
+    background-color: #e4e7eb;
+    font-size: 14px;
+
+    .verification_code_sliderBg {
+      position: absolute;
+      top: 1px;
+      bottom: 1px;
+      left: 1px;
+      right: 1px;
+      background-color: #f7f9fa;
+    }
+
+    .verification_code_track {
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 40px;
+      overflow: hidden;
+
+      .verification_code_track_content {
+        box-sizing: border-box;
+        width: auto;
+        height: 40px;
+        background-color: #d1e9fe;
+        border-style: solid;
+        border-width: 1px 0 1px 1px;
+        border-color: #1991fa;
+      }
+    }
+
+    .verification_code_slider {
+      box-sizing: border-box;
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #1991fa;
+    }
+
+    &.success {
+      .verification_code_track {
+        .verification_code_track_content {
+          background-color: #d2f4ef;
+          border-color: #52ccba;
+        }
+      }
+
+      .verification_code_slider {
+        background-color: #52ccba;
+      }
+    }
+
+    &.fail {
+      .verification_code_track {
+        .verification_code_track_content {
+          background-color: #fce1e1;
+          border-color: #f57a7a;
+        }
+      }
+
+      .verification_code_slider {
+        background-color: #f57a7a;
+      }
+    }
+  }
+
+  .verification_code_refreshIcon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background-image: url(./assets/refresh.svg);
+    background-size: 108% 108%;
+    background-repeat: no-repeat;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.7;
+    border: 5px solid transparent;
+  }
+}
