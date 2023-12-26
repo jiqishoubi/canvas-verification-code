@@ -78,7 +78,7 @@ class CanvasVerificationCode {
     this.options = Object.assign(defaultOptions, options)
     this.doms = this.initDoms()
     this.bindEvents()
-    this.initImg()
+    this.initLoadImg()
   }
 
   initDoms() {
@@ -103,9 +103,7 @@ class CanvasVerificationCode {
       <div class='verification_code_track'>
         <div class='verification_code_track_content'></div>
       </div>
-      <div class='verification_code_slider'>
-        箭头
-      </div>
+      <div class='verification_code_slider'></div>
     `
 
     const refreshIcon = document.createElement('div')
@@ -129,7 +127,7 @@ class CanvasVerificationCode {
     }
   }
 
-  initImg() {
+  initLoadImg() {
     const x = getRandomNumberByRange(allBlockSize, this.options.width - allBlockSize)
     const y = getRandomNumberByRange(blockCircleRadius * 2, this.options.height - blockSize)
     this.vars.blockX = x
@@ -203,11 +201,13 @@ class CanvasVerificationCode {
           this.doms.el.classList.add('fail')
           this.options.onFail?.()
         }
+        this.doms.el.classList.remove('dragging')
       } else {
         // 验证失败 没对准
         this.doms.el.classList.add('fail')
         this.options.onFail?.()
         setTimeout(() => {
+          this.doms.el.classList.remove('dragging')
           this.reset()
         }, 800)
       }
@@ -252,7 +252,7 @@ class CanvasVerificationCode {
     this.doms.blockCtx.clearRect(0, 0, this.options.width, this.options.height)
     this.doms.blockCanvas.width = this.options.width
 
-    this.initImg()
+    this.initLoadImg()
   }
 }
 
