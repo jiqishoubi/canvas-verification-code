@@ -1,15 +1,10 @@
 import './source'
 
-// document.getElementById('btn').addEventListener('click', () => {
-//   new CanvasVerificationCode({
-//     el: document.getElementById('code_container'),
-//     width: 100,
-//     height: 50,
-//     code: '1234',
-//   })
-// })
+document.getElementById('btn')!.addEventListener('click', () => {
+  initCanvasVerificationCode()
+})
 
-window.onload = () => {
+function initCanvasVerificationCode() {
   // @ts-ignore
   new CanvasVerificationCode({
     el: document.getElementById('code_container'),

@@ -4,6 +4,7 @@ const blockSize = 40
 const blockCircleRadius = 7
 const blockGap = 2
 const allBlockSize = blockSize + blockCircleRadius * 2
+const sliderTip = '向右滑动滑块填充拼图'
 
 function isIE() {
   return window.navigator.userAgent.indexOf('Trident') > -1
@@ -27,6 +28,20 @@ function _draw(ctx: CanvasRenderingContext2D, x: number, y: number, operation: '
   ctx.fill()
   ctx[operation]()
   ctx.globalCompositeOperation = isIE() ? 'xor' : 'overlay'
+}
+
+function showLoading() {
+  const mask = document.querySelector('.verification_code_loadingMask')
+  if (mask) {
+    ;(mask as HTMLElement).style.display = 'flex'
+  }
+}
+
+function hideLoading() {
+  const mask = document.querySelector('.verification_code_loadingMask')
+  if (mask) {
+    ;(mask as HTMLElement).style.display = 'none'
+  }
 }
 
 interface ICanvasVerificationCodeOptions {
@@ -83,6 +98,7 @@ class CanvasVerificationCode {
 
   initDoms() {
     const el = this.options.el
+    el.innerHTML = ''
     el.classList.add('verification_code_container')
     el.style.width = this.options.width + 'px'
 
@@ -98,7 +114,7 @@ class CanvasVerificationCode {
     sliderContainer.classList.add('verification_code_sliderContainer')
     sliderContainer.innerHTML = `
       <div class='verification_code_sliderBg'>
-        <span class='verification_code_tip_text'>向右滑动滑块填充拼图</span>
+        <span class='verification_code_tip_text'>${sliderTip}</span>
       </div>
       <div class='verification_code_track'>
         <div class='verification_code_track_content'></div>
@@ -109,10 +125,17 @@ class CanvasVerificationCode {
     const refreshIcon = document.createElement('div')
     refreshIcon.classList.add('verification_code_refreshIcon')
 
+    const loadingMask = document.createElement('div')
+    loadingMask.classList.add('verification_code_loadingMask')
+    loadingMask.innerHTML = `
+      <div class='verification_code_loadingIcon'></div>
+    `
+
     el.appendChild(canvas)
     el.appendChild(blockCanvas)
     el.appendChild(sliderContainer)
     el.appendChild(refreshIcon)
+    el.appendChild(loadingMask)
 
     return {
       el,
@@ -128,6 +151,7 @@ class CanvasVerificationCode {
   }
 
   initLoadImg() {
+    showLoading()
     const x = getRandomNumberByRange(allBlockSize, this.options.width - allBlockSize)
     const y = getRandomNumberByRange(blockCircleRadius * 2, this.options.height - blockSize)
     this.vars.blockX = x
@@ -145,7 +169,9 @@ class CanvasVerificationCode {
       const imageData = this.doms.blockCtx.getImageData(x, y - blockCircleRadius * 2, allBlockSize, allBlockSize)
       this.doms.blockCanvas.width = allBlockSize
       this.doms.blockCtx.putImageData(imageData, 0, y - blockCircleRadius * 2)
+      hideLoading()
     }
+    img.onerror = () => {}
   }
 
   bindEvents() {
@@ -243,14 +269,16 @@ class CanvasVerificationCode {
       finish: false,
     }
 
-    this.doms.blockCanvas.style.left = '0px'
     this.doms.el.classList.remove('dragging', 'success', 'fail')
+    this.doms.blockCanvas.style.left = '0px'
+    this.doms.blockCanvas.width = this.options.width
     this.doms.sliderTrack.style.width = '0px'
     this.doms.slider.style.left = '0px'
 
     this.doms.canvasCtx.clearRect(0, 0, this.options.width, this.options.height)
     this.doms.blockCtx.clearRect(0, 0, this.options.width, this.options.height)
-    this.doms.blockCanvas.width = this.options.width
+
+    document.querySelector('.verification_code_tip_text')!.innerHTML = sliderTip
 
     this.initLoadImg()
   }

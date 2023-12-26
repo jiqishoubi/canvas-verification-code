@@ -89,6 +89,27 @@
     border: 5px solid transparent;
   }
 
+  .verification_code_loadingMask {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .verification_code_loadingIcon {
+      width: 40px;
+      height: 40px;
+      background-image: url(./assets/loading.svg);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: loading_ 2s infinite linear;
+    }
+  }
+
   &.dragging {
     .verification_code_refreshIcon {
       display: none;
@@ -125,5 +146,14 @@
         background-image: url(./assets/close.svg);
       }
     }
+  }
+}
+
+@keyframes loading_ {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
