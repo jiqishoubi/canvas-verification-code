@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import path from 'path'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import pkgJson from './package.json'
 
 export default defineConfig({
   plugins: [cssInjectedByJsPlugin()],
@@ -9,7 +10,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, './src/source/index.ts'),
       name: 'CanvasVerificationCode',
-      fileName: 'CanvasVerificationCode',
+      fileName: 'CanvasVerificationCode.' + pkgJson.version,
     },
     emptyOutDir: true,
     rollupOptions: {
