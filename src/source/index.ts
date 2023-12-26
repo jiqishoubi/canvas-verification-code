@@ -50,6 +50,7 @@ class CanvasVerificationCode {
     onFail?: () => void
   }
   doms: {
+    el: HTMLElement
     canvas: HTMLCanvasElement
     canvasCtx: CanvasRenderingContext2D
     blockCanvas: HTMLCanvasElement
@@ -63,8 +64,10 @@ class CanvasVerificationCode {
     blockX?: number
     blockY?: number
     trail: number[]
+    finish: boolean
   } = {
     trail: [],
+    finish: false,
   }
 
   constructor(options: ICanvasVerificationCodeOptions) {
@@ -74,13 +77,14 @@ class CanvasVerificationCode {
     }
     this.options = Object.assign(defaultOptions, options)
     this.doms = this.initDoms()
-    this.initImg()
     this.bindEvents()
+    this.initImg()
   }
 
   initDoms() {
-    this.options.el.classList.add('verification_code_container')
-    this.options.el.style.width = this.options.width + 'px'
+    const el = this.options.el
+    el.classList.add('verification_code_container')
+    el.style.width = this.options.width + 'px'
 
     const canvas = document.createElement('canvas')
     canvas.width = this.options.width
@@ -93,7 +97,9 @@ class CanvasVerificationCode {
     const sliderContainer = document.createElement('div')
     sliderContainer.classList.add('verification_code_sliderContainer')
     sliderContainer.innerHTML = `
-      <div class='verification_code_sliderBg'></div>
+      <div class='verification_code_sliderBg'>
+        <span class='verification_code_tip_text'>向右滑动滑块填充拼图</span>
+      </div>
       <div class='verification_code_track'>
         <div class='verification_code_track_content'></div>
       </div>
@@ -105,12 +111,13 @@ class CanvasVerificationCode {
     const refreshIcon = document.createElement('div')
     refreshIcon.classList.add('verification_code_refreshIcon')
 
-    this.options.el.appendChild(canvas)
-    this.options.el.appendChild(blockCanvas)
-    this.options.el.appendChild(sliderContainer)
-    this.options.el.appendChild(refreshIcon)
+    el.appendChild(canvas)
+    el.appendChild(blockCanvas)
+    el.appendChild(sliderContainer)
+    el.appendChild(refreshIcon)
 
     return {
+      el,
       canvas,
       canvasCtx: canvas.getContext('2d') as CanvasRenderingContext2D,
       blockCanvas,
@@ -147,20 +154,21 @@ class CanvasVerificationCode {
     let originX: number,
       originY: number,
       trail: number[] = [],
-      isMouseDown = false,
-      finish = false
+      isMouseDown = false
 
-    this.options.el.onselectstart = () => false
+    this.doms.el.onselectstart = () => false
     this.doms.refreshIcon.onclick = () => {
       this.reset()
       this.options.onRefresh?.()
     }
 
     const handleDragStart = (e: any) => {
-      if (finish) return false
+      if (this.vars.finish) return false
       isMouseDown = true
       originX = e.clientX || e.touches[0].clientX
       originY = e.clientY || e.touches[0].clientY
+      this.doms.el.classList.add('dragging')
+      document.querySelector('.verification_code_tip_text')!.innerHTML = ''
     }
 
     const handleDragMove = (e: any) => {
@@ -180,7 +188,7 @@ class CanvasVerificationCode {
     const handleDragEnd = (e: any) => {
       if (!isMouseDown) return false
       isMouseDown = false
-      finish = true
+      this.vars.finish = true
       const eventX = e.clientX || e.changedTouches[0].clientX
       if (eventX == originX) return false
       this.vars.trail = trail
@@ -188,21 +196,20 @@ class CanvasVerificationCode {
       if (success) {
         if (verified) {
           // 人为
-          this.doms.sliderContainer.classList.add('success')
+          this.doms.el.classList.add('success')
           this.options.onSuccess?.()
         } else {
           // 非人为
-          this.doms.sliderContainer.classList.add('fail')
+          this.doms.el.classList.add('fail')
           this.options.onFail?.()
-          this.reset()
         }
       } else {
         // 验证失败 没对准
-        this.doms.sliderContainer.classList.add('fail')
+        this.doms.el.classList.add('fail')
         this.options.onFail?.()
         setTimeout(() => {
           this.reset()
-        }, 1000)
+        }, 800)
       }
     }
 
@@ -231,9 +238,21 @@ class CanvasVerificationCode {
   }
 
   reset() {
-    // this.block.style.left = '0px'
-    // this.sliderTrack.style.width = '0px'
-    // this.slider.style.left = '0px'
+    this.vars = {
+      trail: [],
+      finish: false,
+    }
+
+    this.doms.blockCanvas.style.left = '0px'
+    this.doms.el.classList.remove('dragging', 'success', 'fail')
+    this.doms.sliderTrack.style.width = '0px'
+    this.doms.slider.style.left = '0px'
+
+    this.doms.canvasCtx.clearRect(0, 0, this.options.width, this.options.height)
+    this.doms.blockCtx.clearRect(0, 0, this.options.width, this.options.height)
+    this.doms.blockCanvas.width = this.options.width
+
+    this.initImg()
   }
 }
 
