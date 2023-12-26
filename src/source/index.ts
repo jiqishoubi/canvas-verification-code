@@ -76,11 +76,13 @@ class CanvasVerificationCode {
     slider: HTMLElement
   }
   vars: {
+    imgIndex: number
     blockX?: number
     blockY?: number
     trail: number[]
     finish: boolean
   } = {
+    imgIndex: -1,
     trail: [],
     finish: false,
   }
@@ -151,7 +153,6 @@ class CanvasVerificationCode {
   }
 
   initLoadImg() {
-    showLoading()
     const x = getRandomNumberByRange(allBlockSize, this.options.width - allBlockSize)
     const y = getRandomNumberByRange(blockCircleRadius * 2, this.options.height - blockSize)
     this.vars.blockX = x
@@ -160,9 +161,11 @@ class CanvasVerificationCode {
     _draw(this.doms.canvasCtx, x, y, 'fill')
     _draw(this.doms.blockCtx, x, y, 'clip')
 
+    // 加载img
+    showLoading()
     const img = new Image()
     img.crossOrigin = 'anonymous'
-    img.src = this.options.imgArr[0]
+    img.src = this.getImgSrc()
     img.onload = () => {
       this.doms.canvasCtx.drawImage(img, 0, 0, this.options.width, this.options.height)
       this.doms.blockCtx.drawImage(img, 0, 0, this.options.width, this.options.height)
@@ -172,6 +175,11 @@ class CanvasVerificationCode {
       hideLoading()
     }
     img.onerror = () => {}
+  }
+
+  getImgSrc() {
+    this.vars.imgIndex = this.vars.imgIndex + 1 > this.options.imgArr.length - 1 ? 0 : this.vars.imgIndex + 1
+    return this.options.imgArr[this.vars.imgIndex]
   }
 
   bindEvents() {
@@ -264,10 +272,8 @@ class CanvasVerificationCode {
   }
 
   reset() {
-    this.vars = {
-      trail: [],
-      finish: false,
-    }
+    this.vars.trail = []
+    this.vars.finish = false
 
     this.doms.el.classList.remove('dragging', 'success', 'fail')
     this.doms.blockCanvas.style.left = '0px'
